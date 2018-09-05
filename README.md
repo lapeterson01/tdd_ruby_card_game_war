@@ -13,7 +13,7 @@ AND
 
 The manual system test
 ```
-ruby lib/game_runner.rb
+ruby lib/war_runner.rb
 ```
 produces something like:
 ```
