@@ -3,28 +3,20 @@ require_relative 'war_player'
 require('pry')
 
 class WarGame
+    attr_reader :player1, :player2
+
     def start
         @deck = CardDeck.new
-        @player1 = WarPlayer.new
-        @player1.set_name('Player 1')
-        @player2 = WarPlayer.new
-        @player2.set_name('Player 2')
-        @deck.shuffle
-        until @deck.cardsLeft.eql?(0) do
+        @player1 = WarPlayer.new('Player 1')
+        @player2 = WarPlayer.new('Player 2')
+        @deck.shuffle_deck
+        until @deck.cards_left.eql?(0) do
             card1 = @deck.deal
             @player1.retrieve_card(card1)
             card2 = @deck.deal
             @player2.retrieve_card(card2)
         end
         @winner
-    end
-
-    def player(number)
-        if number.eql?(1)
-            return @player1
-        else
-            return @player2
-        end
     end
 
     def play_round
