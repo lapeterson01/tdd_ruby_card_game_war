@@ -2,8 +2,7 @@ class WarPlayer
     attr_reader :name, :hand
 
     def initialize(name)
-        @hand = []
-        @name = name
+        @hand, @name = [], name
     end
 
     def retrieve_card(card)

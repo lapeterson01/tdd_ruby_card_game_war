@@ -1,24 +1,19 @@
 class PlayingCard
     attr_reader :value, :rank, :suit
 
+    FACE_CARD_VALUES = {'J' => 11, 'Q' => 12, 'K' => 13, 'A' => 14}
+
     def initialize(rank, suit)
-        @rank = rank
-        @suit = suit
-        @face_card_values = {
-            'J' => 11,
-            'Q' => 12,
-            'K' => 13,
-            'A' => 14
-        }
+        @rank, @suit = rank, suit
         @value
-        if rank == 'J' || rank == 'Q' || rank == 'K' || rank == 'A'
-            @value = @face_card_values[rank]
-        else
-            @value = rank.to_i
-        end
+        rank == 'J' || rank == 'Q' || rank == 'K' || rank == 'A' ? @value = FACE_CARD_VALUES[rank] : @value = rank.to_i
     end
 
     def card
         card = {'rank' => @rank, 'suit' => @suit}
+    end
+
+    def == other
+        @rank == other.rank && @suit == other.suit
     end
 end

@@ -1,32 +1,31 @@
 require_relative 'playing_card'
+require 'pry'
 
 class CardDeck
-  attr_reader :deck
+  attr_reader :cards
+
+  RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+  SUITS = ['Spades', 'Clubs', 'Diamonds', 'Hearts']
 
   def initialize
-    @card_types = {
-      'ranks' => ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'],
-      'suits' => ['Spades', 'Clubs', 'Diamonds', 'Hearts']
-    }
-    @deck = []
-    @card_types['suits'].each do |suit|
-      @card_types['ranks'].each do |rank|
-        card = PlayingCard.new(rank, suit)
-        @deck.push(card)
-      end
-    end
-    @current_card
+    @cards = RANKS.map{|rank| SUITS.map{|suit| PlayingCard.new(rank, suit)}}.flatten
   end
 
   def cards_left
-    @deck.length
+    @cards.length
   end
 
   def deal
-    @current_card = @deck.shift
+    @cards.shift
   end
 
-  def shuffle_deck
-    @deck.shuffle!
+  def shuffle!
+    @cards.shuffle!
+  end
+
+  def == other
+    equal = true
+    other.cards.each {|card2| equal = false if @cards[other.cards.index(card2)] != card2}
+    equal
   end
 end
