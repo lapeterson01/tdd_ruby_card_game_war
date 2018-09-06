@@ -3,6 +3,7 @@ class WarPlayer
 
     def initialize(name)
         @hand, @name = [], name
+        @client
     end
 
     def retrieve_card(card)
@@ -19,5 +20,9 @@ class WarPlayer
 
     def reset_hand
         @hand = []
+    end
+
+    def set_client(client)
+        @client = client
     end
 end
