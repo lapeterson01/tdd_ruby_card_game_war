@@ -128,7 +128,7 @@ describe WarSocketServer do
     @server.create_game_if_possible
     @server.run_game
     client1_output, client2_output = client1.capture_output, client2.capture_output
-    expect(client1_output && client2_output).to match /Player 1 has 26 cards left; Player 2 has 26 cards left/
+    expect(client1_output && client2_output).to match /You have 26 cards left/
     expect(client1_output && client2_output).to include('Player', 'took', 'of', 'with')
   end
 end

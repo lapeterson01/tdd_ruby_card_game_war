@@ -1,5 +1,5 @@
 class WarPlayer
-    attr_reader :name, :hand
+    attr_reader :name, :hand, :client
 
     def initialize(name)
         @hand, @name = [], name
