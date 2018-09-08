@@ -40,14 +40,13 @@ describe 'WarPlayer' do
         end
     end
 
-    describe '#has_all_cards?' do
+    describe '#out_of_cards?' do
         it 'returns true if player has all 52 cards' do
-            deck = CardDeck.new
-            52.times do
-                card = deck.deal
-                @player.retrieve_card(card)
-            end
-            expect(@player.has_all_cards?).to eq true
+            card = PlayingCard.new('A', 'Spades')
+            @player.retrieve_card(card)
+            expect(@player.out_of_cards?).to eq false
+            player2 = WarPlayer.new('Player 2')
+            expect(player2.out_of_cards?).to eq true
         end
     end
 end

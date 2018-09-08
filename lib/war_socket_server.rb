@@ -1,11 +1,13 @@
 require 'socket'
+require_relative 'war_socket_game_runner'
 
 class WarSocketServer
-  attr_reader :game
+  attr_reader :games
 
   def initialize
-    @game
+    @games = {}
     @players = {}
+    @pending_clients = []
   end
 
   def port_number
@@ -18,43 +20,25 @@ class WarSocketServer
 
   def accept_new_client(player_name = "Random Player")
     client = @server.accept_nonblock
-    # associate player and client
-    until client do
-      sleep(0.1)
-    end
-    @players[player_name] = client
-    client.puts "#{player_name} connected!"
+    sleep(0.1) until client
+    @pending_clients.push(client)
+    client.puts "You are connected!"
+    @pending_clients.length.odd? ? client.puts("Waiting for another player") : client.puts("Prepare to go to war!")
   rescue IO::WaitReadable, Errno::EINTR
     puts "No client to accept"
   end
 
   def create_game_if_possible
-    if @players.length == 2
-      @game = WarGame.new
-      @player1, @player2 = @game.player1, @game.player2
-      @player1.set_client(@players[@player1.name])
-      @player2.set_client(@players[@player2.name])
-      @players = [@player1, @player2]
-      @players.each {|player| player.client.puts 'Ready?'}
+    if @pending_clients.length > 1
+      game = WarGame.new
+      @games[game] = @pending_clients.shift(2)
+      game
     end
   end
 
-  def run_game
-    if @game
-      @players.each {|player| player.client.puts 'Game Started!'}
-      @game.start
-      # until @game.winner
-        @players.each {|player| player.client.puts "You have #{player.hand.length} cards left"}
-        round_result = @game.play_round
-        if round_result.include? 'Player 1'
-          @player1.client.puts round_result.sub('Player 1', 'You')
-          @player2.client.puts round_result
-        else
-          @player2.client.puts round_result.sub('Player 2', 'You')
-          @player1.client.puts round_result
-        end
-      # end
-      # @game.winner
+  def run_game(game)
+    if game
+      game_runner = WarSocketGameRunner.new(game, @games[game])
     end
   end
 

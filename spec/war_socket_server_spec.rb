@@ -53,82 +53,76 @@ describe WarSocketServer do
     @server.start
     client1 = MockWarSocketClient.new(@server.port_number)
     @clients.push(client1)
-    @server.accept_new_client("Player 1")
+    @server.accept_new_client
     @server.create_game_if_possible
-    expect(@server.game).to be nil
+    expect(@server.games.length).to eq 0
     client2 = MockWarSocketClient.new(@server.port_number)
     @clients.push(client2)
-    @server.accept_new_client("Player 2")
+    @server.accept_new_client
     @server.create_game_if_possible
-    expect(@server.game).to_not be nil
+    expect(@server.games.length).to eq 1
   end
 
   it 'runs the game if it has been created' do
     @server.start
     client1 = MockWarSocketClient.new(@server.port_number)
     @clients.push(client1)
-    @server.accept_new_client('Player 1')
+    @server.accept_new_client
     client2 = MockWarSocketClient.new(@server.port_number)
     @clients.push(client2)
-    @server.accept_new_client('Player 2')
-    @server.run_game
-    expect(client1.capture_output || client2.capture_output).to_not match /Game Started!/
-    @server.create_game_if_possible
-    @server.run_game
-    expect(client1.capture_output && client2.capture_output).to match /Game Started!/
+    @server.accept_new_client
+    expect(@server.run_game(nil)).to_not be_instance_of WarSocketGameRunner
+    game = @server.create_game_if_possible
+    expect(@server.run_game(game)).to be_instance_of WarSocketGameRunner
   end
-
-  # Add more tests to make sure the game is being played
-  # For example:
-  #   make sure the mock client gets appropriate output
-  #   make sure the next round isn't played until both clients say they are ready to play
-  #   ...
 
   it 'sends a message to be received by the client when client is connected' do
     @server.start
     client = MockWarSocketClient.new(@server.port_number)
     @clients.push(client)
-    @server.accept_new_client('Player 1')
-    expect(client.capture_output.strip).to eq 'Player 1 connected!'
+    @server.accept_new_client
+    expect(client.capture_output).to match /You are connected!/
   end
 
-  it 'sends a message to be received by the client when game has started' do
+  it 'sends a message to client if no other player has joined yet and a message to both clients when second client joins' do
     @server.start
     client1 = MockWarSocketClient.new(@server.port_number)
-    @clients.push(client1)
-    @server.accept_new_client('Player 1')
+    @server.accept_new_client
+    expect(client1.capture_output).to match /Waiting for another player/
     client2 = MockWarSocketClient.new(@server.port_number)
-    @clients.push(client2)
-    @server.accept_new_client('Player 2')
-    @server.create_game_if_possible
-    @server.run_game
-    expect(client1.capture_output && client2.capture_output).to match /Game Started!/
+    @server.accept_new_client
+    @clients << client1 << client2
+    expect(client1.capture_output && client2.capture_output).to match /Prepare to go to war!/
   end
 
-  it 'sends a message to be received by the client to ask if players are ready' do
-    @server.start
-    client1 = MockWarSocketClient.new(@server.port_number)
-    @clients.push(client1)
-    @server.accept_new_client('Player 1')
-    client2 = MockWarSocketClient.new(@server.port_number)
-    @clients.push(client2)
-    @server.accept_new_client('Player 2')
-    @server.create_game_if_possible
-    expect(client1.capture_output && client2.capture_output).to match /Ready?/
-  end
-
-  it 'sends a message to be received by the client to inform player how many cards that they have left' do
-    @server.start
-    client1 = MockWarSocketClient.new(@server.port_number)
-    @clients.push(client1)
-    @server.accept_new_client('Player 1')
-    client2 = MockWarSocketClient.new(@server.port_number)
-    @clients.push(client2)
-    @server.accept_new_client('Player 2')
-    @server.create_game_if_possible
-    @server.run_game
-    client1_output, client2_output = client1.capture_output, client2.capture_output
-    expect(client1_output && client2_output).to match /You have 26 cards left/
-    expect(client1_output && client2_output).to include('Player', 'took', 'of', 'with')
-  end
+  # it 'handles multiple games at once' do
+  #   @server.start
+  #   client1 = MockWarSocketClient.new(@server.port_number)
+  #   @server.accept_new_client
+  #   client2 = MockWarSocketClient.new(@server.port_number)
+  #   @server.accept_new_client
+  #   client3 = MockWarSocketClient.new(@server.port_number)
+  #   @server.accept_new_client
+  #   client4 = MockWarSocketClient.new(@server.port_number)
+  #   @server.accept_new_client
+  #   @clients << client1 << client2 << client3 << client4
+  #   game1 = @server.create_game_if_possible
+  #   game_runner1 = @server.run_game(game1)
+  #   expect(game_runner1).to be_instance_of WarSocketGameRunner
+  #   game2 = @server.create_game_if_possible
+  #   game_runner2 = @server.run_game(game2)
+  #   expect(game_runner2).to be_instance_of WarSocketGameRunner
+  #   card1, card2 = PlayingCard.new('A', 'Spades'), PlayingCard.new('2', 'Hearts')
+  #   game1.player1.retrieve_card(card1)
+  #   game1.player2.retrieve_card(card2)
+  #   game_runner1.play_round
+  #   expect(client1.capture_output).to match /You took 2 of Hearts with A of Spades/
+  #   expect(client2.capture_output).to match /Player 1 took 2 of Hearts with A of Spades/
+  #   card3, card4 = PlayingCard.new('2', 'Clubs'), PlayingCard.new('K', 'Diamonds')
+  #   game2.player1.retrieve_card(card3)
+  #   game2.player2.retrieve_card(card4)
+  #   game_runner2.play_round
+  #   expect(client3.capture_output).to match /Player 2 took 2 of Clubs with K of Diamonds/
+  #   expect(client4.capture_output).to match /You took 2 of Clubs with K of Diamonds/
+  # end
 end

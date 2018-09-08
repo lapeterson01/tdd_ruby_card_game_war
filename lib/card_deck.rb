@@ -7,8 +7,8 @@ class CardDeck
   RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
   SUITS = ['Spades', 'Clubs', 'Diamonds', 'Hearts']
 
-  def initialize
-    @cards = RANKS.map{|rank| SUITS.map{|suit| PlayingCard.new(rank, suit)}}.flatten
+  def initialize(cards = RANKS.map{|rank| SUITS.map{|suit| PlayingCard.new(rank, suit)}}.flatten)
+    @cards = cards
   end
 
   def cards_left

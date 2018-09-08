@@ -5,8 +5,8 @@ require('pry')
 class WarGame
     attr_reader :player1, :player2
 
-    def initialize
-        @deck = CardDeck.new
+    def initialize(deck = CardDeck.new)
+        @deck = deck
         @player1, @player2 = WarPlayer.new('Player 1'), WarPlayer.new('Player 2')
         @winner
     end
@@ -23,7 +23,11 @@ class WarGame
 
         if card1.value == card2.value
             while card1.value == card2.value do
-                card1, card2 = @player1.play_card, @player2.play_card
+                if @player1.hand.length > 0 && @player2.hand.length > 0
+                    card1, card2 = @player1.play_card, @player2.play_card
+                else
+                    return
+                end
                 played_cards << card1 << card2
             end
         end
@@ -54,7 +58,14 @@ class WarGame
     end
 
     def winner
-        @player1.has_all_cards? ? @winner = @player1 : 
-            @player2.has_all_cards? ? @winner = @player2 : @winner
+        if @player1.out_of_cards? && @player2.out_of_cards?
+            @winner = @player1.hand > @player2.hand ? @player1 : @player2
+        elsif @player2.out_of_cards?
+            @winner = @player1
+        elsif @player1.out_of_cards?
+            @winner = @player2
+        else
+            @winner
+        end
     end
 end
