@@ -1,5 +1,6 @@
 require 'socket'
 require_relative 'war_socket_game_runner'
+require_relative 'war_game'
 
 class WarSocketServer
   attr_reader :games
@@ -25,7 +26,7 @@ class WarSocketServer
     client.puts "You are connected!"
     @pending_clients.length.odd? ? client.puts("Waiting for another player") : client.puts("Prepare to go to war!")
   rescue IO::WaitReadable, Errno::EINTR
-    puts "No client to accept"
+    
   end
 
   def create_game_if_possible
@@ -37,8 +38,13 @@ class WarSocketServer
   end
 
   def run_game(game)
-    if game
-      game_runner = WarSocketGameRunner.new(game, @games[game])
+    Thread.start do
+      @game_runner = WarSocketGameRunner.new(game, @games[game])
+      @game_runner.start
+      until @game_runner.winner
+        @game_runner.play_round
+      end
+      @game_runner.winner
     end
   end
 

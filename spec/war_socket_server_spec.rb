@@ -63,19 +63,6 @@ describe WarSocketServer do
     expect(@server.games.length).to eq 1
   end
 
-  it 'runs the game if it has been created' do
-    @server.start
-    client1 = MockWarSocketClient.new(@server.port_number)
-    @clients.push(client1)
-    @server.accept_new_client
-    client2 = MockWarSocketClient.new(@server.port_number)
-    @clients.push(client2)
-    @server.accept_new_client
-    expect(@server.run_game(nil)).to_not be_instance_of WarSocketGameRunner
-    game = @server.create_game_if_possible
-    expect(@server.run_game(game)).to be_instance_of WarSocketGameRunner
-  end
-
   it 'sends a message to be received by the client when client is connected' do
     @server.start
     client = MockWarSocketClient.new(@server.port_number)

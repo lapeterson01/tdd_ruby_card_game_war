@@ -21,6 +21,7 @@ class WarGame
         card1, card2 = @player1.play_card, @player2.play_card
         played_cards << card1 << card2
 
+        # check_tie(played_cards)
         if card1.value == card2.value
             while card1.value == card2.value do
                 if @player1.hand.length > 0 && @player2.hand.length > 0
@@ -66,6 +67,23 @@ class WarGame
             @winner = @player2
         else
             @winner
+        end
+    end
+
+    private
+
+    def check_tie(played_cards)
+binding.pry
+        card1, card2 = played_cards[0], played_cards[1]
+        if card1.value == card2.value
+            while card1.value == card2.value do
+                if @player1.hand.length > 0 && @player2.hand.length > 0
+                    card1, card2 = @player1.play_card, @player2.play_card
+                else
+                    return
+                end
+                played_cards << card1 << card2
+            end
         end
     end
 end
