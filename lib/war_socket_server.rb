@@ -38,13 +38,13 @@ class WarSocketServer
   end
 
   def run_game(game)
-    Thread.start do
-      @game_runner = WarSocketGameRunner.new(game, @games[game])
-      @game_runner.start
-      until @game_runner.winner
-        @game_runner.play_round
+    game_runner = WarSocketGameRunner.new(game, @games[game])
+    game_runner.start
+    Thread.start() do
+      until game_runner.winner
+        game_runner.play_round
       end
-      @game_runner.winner
+      game_runner.winner
     end
   end
 
