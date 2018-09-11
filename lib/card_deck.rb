@@ -1,7 +1,6 @@
 require_relative 'playing_card'
-require 'pry'
 
-# creates a new deck of 52 standard playing cards
+# Creates a new deck of 52 standard playing cards
 class CardDeck
   attr_reader :cards
 
@@ -12,7 +11,7 @@ class CardDeck
     cards = RANKS.map do |rank|
       SUITS.map { |suit| PlayingCard.new(rank, suit) }
     end
-    cards.flatten
+    cards.flatten!
     @cards = cards
   end
 
