@@ -1,13 +1,18 @@
 require_relative 'playing_card'
 require 'pry'
 
+# creates a new deck of 52 standard playing cards
 class CardDeck
   attr_reader :cards
 
-  RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
-  SUITS = ['Spades', 'Clubs', 'Diamonds', 'Hearts']
+  RANKS = %w[2 3 4 5 6 7 8 9 10 J Q K A].freeze
+  SUITS = %w[Spades Clubs Diamonds Hearts].freeze
 
-  def initialize(cards = RANKS.map{|rank| SUITS.map{|suit| PlayingCard.new(rank, suit)}}.flatten)
+  def initialize
+    cards = RANKS.map do |rank|
+      SUITS.map { |suit| PlayingCard.new(rank, suit) }
+    end
+    cards.flatten
     @cards = cards
   end
 
@@ -23,9 +28,11 @@ class CardDeck
     @cards.shuffle!
   end
 
-  def == other
+  def ==(other)
     equal = true
-    other.cards.each {|card2| equal = false if @cards[other.cards.index(card2)] != card2}
+    other.cards.each do |card2|
+      equal = false if @cards[other.cards.index(card2)] != card2
+    end
     equal
   end
 end

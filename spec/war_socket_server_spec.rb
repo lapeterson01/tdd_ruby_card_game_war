@@ -81,35 +81,4 @@ describe WarSocketServer do
     @clients << client1 << client2
     expect(client1.capture_output && client2.capture_output).to match /Prepare to go to war!/
   end
-
-  # it 'handles multiple games at once' do
-  #   @server.start
-  #   client1 = MockWarSocketClient.new(@server.port_number)
-  #   @server.accept_new_client
-  #   client2 = MockWarSocketClient.new(@server.port_number)
-  #   @server.accept_new_client
-  #   client3 = MockWarSocketClient.new(@server.port_number)
-  #   @server.accept_new_client
-  #   client4 = MockWarSocketClient.new(@server.port_number)
-  #   @server.accept_new_client
-  #   @clients << client1 << client2 << client3 << client4
-  #   game1 = @server.create_game_if_possible
-  #   game_runner1 = @server.run_game(game1)
-  #   expect(game_runner1).to be_instance_of WarSocketGameRunner
-  #   game2 = @server.create_game_if_possible
-  #   game_runner2 = @server.run_game(game2)
-  #   expect(game_runner2).to be_instance_of WarSocketGameRunner
-  #   card1, card2 = PlayingCard.new('A', 'Spades'), PlayingCard.new('2', 'Hearts')
-  #   game1.player1.retrieve_card(card1)
-  #   game1.player2.retrieve_card(card2)
-  #   game_runner1.play_round
-  #   expect(client1.capture_output).to match /You took 2 of Hearts with A of Spades/
-  #   expect(client2.capture_output).to match /Player 1 took 2 of Hearts with A of Spades/
-  #   card3, card4 = PlayingCard.new('2', 'Clubs'), PlayingCard.new('K', 'Diamonds')
-  #   game2.player1.retrieve_card(card3)
-  #   game2.player2.retrieve_card(card4)
-  #   game_runner2.play_round
-  #   expect(client3.capture_output).to match /Player 2 took 2 of Clubs with K of Diamonds/
-  #   expect(client4.capture_output).to match /You took 2 of Clubs with K of Diamonds/
-  # end
 end
