@@ -3,76 +3,67 @@ require 'pry'
 
 describe 'WarGame' do
   let(:game) { WarGame.new }
+  let(:player1) { game.player1 }
+  let(:player2) { game.player2 }
 
   describe '#initialize' do
     it 'creates game and players' do
-      expect(game.player1.name).to eq 'Player 1'
-      expect(game.player2.name).to eq 'Player 2'
+      expect(player1.name).to eq 'Player 1'
+      expect(player2.name).to eq 'Player 2'
     end
   end
 
   describe '#start' do
     it 'starts game by shuffling and dealing deck' do
       game.start
-      player1, player2 = game.player1, game.player2
-      expect(26).to eq(player1.hand.length) && eq(player2.hand.length)
+      expect(player1.hand.length && player2.hand.length).to eq(26)
     end
   end
 
-  describe '#play_round' do
-    it 'adds played cards to the hand of the player that won the round' do
-      player1, player2 = game.player1, game.player2
-      card1, card2 = PlayingCard.new('A', 'Spades'), PlayingCard.new('2', 'Hearts')
+  describe 'The started game' do
+    let(:card1) { PlayingCard.new('A', 'Spades') }
+    let(:card2) { PlayingCard.new('2', 'Hearts') }
+    let(:tied_card1) { PlayingCard.new('Q', 'Hearts') }
+    let(:tied_card2) { PlayingCard.new('Q', 'Diamonds') }
 
-      player1.retrieve_card(card1) && player2.retrieve_card(card2)
-      expect(game.play_round).to be_instance_of String
-      expect(player1.hand).to eq [card1, card2]
-      expect(player2.hand).to eq []
-    end
-
-    it 'sends all four cards to the hand of the winning player in the case of a tie' do
-      card1, card2 = PlayingCard.new('Q', 'Spades'), PlayingCard.new('Q', 'Hearts')
-      card3, card4 = PlayingCard.new('A', 'Spades'), PlayingCard.new('2', 'Clubs')
-      player1, player2 = game.player1, game.player2
-
-      player1.retrieve_card(card1) && player2.retrieve_card(card2)
-      player1.retrieve_card(card3) && player2.retrieve_card(card4)
-      game.play_round
-      expect(player1.hand).to eq [card1, card2, card3, card4]
-      expect(player2.hand).to eq []
-    end
-  end
-
-  describe '#winner' do
-    it 'returns the name of the player who won if there is a winner' do
-      player1, player2 = game.player1, game.player2
-      card1, card2 = PlayingCard.new('A', 'Spades'), PlayingCard.new('2', 'Hearts')
-
-      player1.retrieve_card(card1) && player2.retrieve_card(card2)
-
-      deck = CardDeck.new
-      50.times do
-        card = deck.deal
-        player1.retrieve_card(card)
+    describe '#play_round' do
+      it 'adds played cards to the hand of the player that won the round' do
+        player1.retrieve_card(card1) && player2.retrieve_card(card2)
+        expect(game.play_round).to be_instance_of String
+        expect(player1.hand).to eq [card1, card2]
+        expect(player2.hand).to eq []
       end
 
-      game.play_round until game.winner
-      expect(game.winner.name).to eq 'Player 1'
+      it 'sends all four cards to the hand of the winning player in the case of a tie' do
+        player1.retrieve_card(tied_card1) && player2.retrieve_card(tied_card2)
+        player1.retrieve_card(card1) && player2.retrieve_card(card2)
+        game.play_round
+        expect(player1.hand).to eq [tied_card1, tied_card2, card1, card2]
+        expect(player2.hand).to eq []
+      end
     end
 
-    it 'assigns winner in the case of a tie on the last round' do
-      player1, player2 = game.player1, game.player2
-      card1, card2 = PlayingCard.new('A', 'Spades'), PlayingCard.new('A', 'Hearts')
-      player1.retrieve_card(card1) && player2.retrieve_card(card2)
+    describe '#winner' do
+      let(:deck) { CardDeck.new }
 
-      deck = CardDeck.new
-      2.times do
-        card = deck.deal
-        player1.retrieve_card(card)
+      it 'returns the name of the player who won if there is a winner' do
+        player1.retrieve_card(card1) && player2.retrieve_card(card2)
+
+        game.play_round until game.winner
+        expect(game.winner.name).to eq 'Player 1'
       end
 
-      game.play_round until game.winner
-      expect(game.winner.name).to eq 'Player 1'
+      it 'assigns winner in the case of a tie on the last round' do
+        player1.retrieve_card(tied_card1) && player2.retrieve_card(tied_card2)
+
+        2.times do
+          card = deck.deal
+          player1.retrieve_card(card)
+        end
+
+        game.play_round until game.winner
+        expect(game.winner.name).to eq 'Player 1'
+      end
     end
   end
 end
