@@ -2,14 +2,14 @@ require_relative '../lib/war_socket_client'
 require_relative '../lib/war_socket_server'
 require_relative 'war_socket_server_spec'
 
-def setup_clients(server, clients)
-  @client1 = MockWarSocketClient.new(server.port_number)
-  @client2 = MockWarSocketClient.new(server.port_number)
-  2.times { server.accept_new_client }
-  clients << @client1 << @client2
-end
-
 describe WarSocketClient do
+  def setup_clients(server, clients)
+    @client1 = MockWarSocketClient.new(server.port_number)
+    @client2 = MockWarSocketClient.new(server.port_number)
+    2.times { server.accept_new_client }
+    clients << @client1 << @client2
+  end
+
   let(:clients) { [] }
   let(:server) { WarSocketServer.new }
 
