@@ -8,7 +8,7 @@ describe WarSocketGameRunner do
     2.times { server.accept_new_client }
     clients << @client1 << @client2
   end
-  
+
   let(:clients) { [] }
   let(:server) { WarSocketServer.new }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'card_deck'
 require_relative 'war_player'
 
@@ -8,7 +10,6 @@ class WarGame
   def initialize(deck = CardDeck.new)
     @deck = deck
     @player1, @player2 = WarPlayer.new('Player 1'), WarPlayer.new('Player 2')
-    @played_cards = []
     @extra_cards_display = ' '
   end
 
@@ -21,11 +22,11 @@ class WarGame
 
   def play_round
     fetch_cards_being_played
-    @played_cards << @card1 << @card2
+    played_cards = [@card1, @card2]
 
-    check_tie
-    handle_round_result
-    @string_to_display.join(@extra_cards_display) if @string_to_display
+    check_tie(played_cards)
+    handle_round_result(played_cards)
+    @string_to_display&.join(@extra_cards_display)
   end
 
   def winner
@@ -54,54 +55,54 @@ class WarGame
     @player2_win_string_pt2 = "with #{@card2.rank} of #{@card2.suit}"
   end
 
-  def fetch_extra_cards_display
-    (@played_cards - [@card1, @card2]).each do |card|
+  def fetch_extra_cards_display(played_cards)
+    (played_cards - [@card1, @card2]).each do |card|
       rank, suit = card.rank, card.suit
       @extra_cards_display = ", #{rank} of #{suit}" + @extra_cards_display
     end
   end
 
-  def check_tie
+  def check_tie(played_cards)
     @tied_last_round = false
     return unless @card1.value == @card2.value
 
     while @card1.value == @card2.value
       return if @tied_last_round == true
 
-      tie_handler
+      tie_handler(played_cards)
     end
   end
 
-  def tie_handler
+  def tie_handler(played_cards)
     if !@player1.hand.empty? && !@player2.hand.empty?
       @card1, @card2 = @player1.play_card, @player2.play_card
     else
       @tied_last_round = true
     end
-    @played_cards << @card1 << @card2
+    played_cards << @card1 << @card2
   end
 
-  def handle_round_result
+  def handle_round_result(played_cards)
     if @card1.value > @card2.value
-      handle_player1_round_winner
+      handle_player1_round_winner(played_cards)
     elsif @card2.value > @card1.value
-      handle_player2_round_winner
+      handle_player2_round_winner(played_cards)
     end
   end
 
-  def handle_player1_round_winner
-    @played_cards.each { |card| @player1.retrieve_card(card) }
+  def handle_player1_round_winner(played_cards)
+    played_cards.each { |card| @player1.retrieve_card(card) }
 
-    fetch_extra_cards_display if @played_cards.size > 2
+    fetch_extra_cards_display(played_cards) if played_cards.size > 2
 
     fetch_player1_win_strings_to_display
     @string_to_display = [@player1_win_string_pt1, @player1_win_string_pt2]
   end
 
-  def handle_player2_round_winner
-    @played_cards.each { |card| @player2.retrieve_card(card) }
+  def handle_player2_round_winner(played_cards)
+    played_cards.each { |card| @player2.retrieve_card(card) }
 
-    fetch_extra_cards_display if @played_cards.size > 2
+    fetch_extra_cards_display(played_cards) if played_cards.size > 2
 
     fetch_player2_win_strings_to_display
     @string_to_display = [@player2_win_string_pt1, @player2_win_string_pt2]

@@ -8,11 +8,10 @@ class CardDeck
   SUITS = %w[Spades Clubs Diamonds Hearts].freeze
 
   def initialize
-    cards = RANKS.map do |rank|
+    @cards = RANKS.map do |rank|
       SUITS.map { |suit| PlayingCard.new(rank, suit) }
     end
-    cards.flatten!
-    @cards = cards
+    @cards.flatten!
   end
 
   def cards_left

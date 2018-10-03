@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pry'
 require_relative 'war_socket_client'
 
@@ -16,11 +18,8 @@ class WarSocketGameRunner
   end
 
   def start
-    until @client1.ready && @client2.ready
-      @output1, @output2 = @client1.capture_output, @client2.capture_output
-      @client1.ready = true if @output1.include? 'yes'
-      @client2.ready = true if @output2.include? 'yes'
-    end
+    players_ready_status
+    @client1.ready, @client2.ready = false
     provide_input('Game Started!')
     @game.start
   end
@@ -45,6 +44,14 @@ class WarSocketGameRunner
 
   private
 
+  def players_ready_status
+    until @client1.ready && @client2.ready
+      @output1, @output2 = @client1.capture_output, @client2.capture_output
+      @client1.ready = true if @output1.include? 'yes'
+      @client2.ready = true if @output2.include? 'yes'
+    end
+  end
+
   def handle_round_result(round_result)
     if round_result.include? 'Player 1'
       provide_input(round_result.sub('Player 1', 'You'), round_result)
@@ -59,6 +66,7 @@ class WarSocketGameRunner
       @client1.ready = true if @output1.include? 'play card'
       @client2.ready = true if @output2.include? 'play card'
     end
+    @client1.ready, @client2.ready = false
   end
 
   def fetch_cards_left_messages
